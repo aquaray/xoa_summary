@@ -12,44 +12,44 @@ $parser->description .= "\n";
 $parser->description .= "It uses the Xen-Orchestra xo-cli (https://xen-orchestra.com/docs/xo-cli.html) command to get information from XenServer pools. You have to run once xo-cli --register to register the client to your xo-server.\n";
 $parser->description .= "This script reads data from files: pool.json, host.json, SR.json, VM.json, VBD.json, VDI.json. ";
 $parser->description .= "To have them up to date, you should add a cron like:\n";
-$parser->description .= '* * * * * php xs_summary.php --cron';
+$parser->description .= '* * * * * php xoa_summary.php --cron';
 
 $parser->version = '1.0.0';
 $parser->addOption('show_vms', array(
                        'short_name'  => '-v',
                        'long_name'   => '--show-vms',
-                       'description' => 'show VMs.',
+                       'description' => 'show virtual machines',
                        'action'      => 'StoreTrue',
                        'default'     => FALSE,
                        ));
 $parser->addOption('inverse', array(
                        'short_name'  => '-i',
-                       'description' => "Instead displays used values, display available values.",
+                       'description' => "display available values instead of used values",
                        'action'      => 'StoreTrue',
                        'default'     => FALSE,
                        ));
 $parser->addOption('json_path', array(
                        'short_name'  => '-p',
                        'long_name'   => '--json-path',
-                       'description' => "Path to folder containing pool.json, host.json, SR.json, VM.json, VBD.json, VDI.json files.\nDefault is current directory.\nExemple to create files : \n".'for i in VDI VM SR host pool VBD; do '."\n".'   xo-cli --list-objects type=$i >'."\n".'    /tmp/$i.tmp;'."\n".'done;'."\n".'for i in VDI VM SR host pool VBD; do '."\n".'   mv /tmp/$i.tmp /tmp/$i.json;'."\n".'done'."\n",
+                       'description' => "path to folder containing pool.json, host.json, SR.json, VM.json, VBD.json, VDI.json files.\nDefault is ".DEFAULT_JSON_PATH."\n",
                        'help_name'   => 'PATH',
                        'action'=>'StoreString',
                        'default'     => DEFAULT_JSON_PATH,
                        ));
 $parser->addArgument('search', array(
-                         'description' => 'Limit display to pool where search is found in "pool name", or "vm name" or "sr name" or "host name". Search is done case-insensitive.',
+                         'description' => 'limit display to pool where search is found in "pool name", or "vm name" or "sr name" or "host name". Search is done case-insensitive',
                          'optional' => TRUE,
                          'multiple' => FALSE,
                          ));
 
 $parser->addOption('cron', array(
-                       'description' => 'Usefull when run by cron to create data files.',
+                       'description' => 'usefull when run by cron to create data files',
                        'long_name'   => '--cron',
                        'action'      => 'StoreTrue',
                        'default'     => FALSE,
                        ));
 $parser->addOption('xo_cli_path', array(
-                       'description' => 'xo-cli path.',
+                       'description' => 'xo-cli path. Default is "'.DEFAULT_XO_CLI_PATH.'"',
                        'long_name'   => '--xo-cli',
                        'action'      => 'StoreString',
                        'default'     => DEFAULT_XO_CLI_PATH,
@@ -57,7 +57,7 @@ $parser->addOption('xo_cli_path', array(
                        ));
 
 $parser->addOption('debug', array(
-                       'description' => 'Set debug mode (only usefull with --cron).',
+                       'description' => 'set debug mode (only usefull with --cron)',
                        'short_name'  => '-d',
                        'long_name'   => '--debug',
                        'action'      => 'StoreTrue',
