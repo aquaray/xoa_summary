@@ -15,49 +15,56 @@ $parser->description .= "To have them up to date, you should add a cron like:\n"
 $parser->description .= '* * * * * php xoa_summary.php --cron';
 
 $parser->version = '1.0.0';
-$parser->addOption('show_vms', array(
+$parser->addOption('showvms', array(
                        'short_name'  => '-v',
                        'long_name'   => '--show-vms',
-                       'description' => 'show virtual machines',
+                       'description' => 'show VMs.',
                        'action'      => 'StoreTrue',
                        'default'     => FALSE,
                        ));
 $parser->addOption('inverse', array(
                        'short_name'  => '-i',
-                       'description' => "display available values instead of used values",
+                       'description' => "Instead displays used values, display available values.",
                        'action'      => 'StoreTrue',
                        'default'     => FALSE,
                        ));
 $parser->addOption('json_path', array(
                        'short_name'  => '-p',
                        'long_name'   => '--json-path',
-                       'description' => "path to folder containing pool.json, host.json, SR.json, VM.json, VBD.json, VDI.json files.\nDefault is ".DEFAULT_JSON_PATH."\n",
+                       'description' => "Path to folder containing pool.json, host.json, SR.json, VM.json, VBD.json, VDI.json files.\nDefault is current directory.\nExemple to create files : \n".'for i in VDI VM SR host pool VBD; do '."\n".'   xo-cli --list-objects type=$i >'."\n".'    /tmp/$i.tmp;'."\n".'done;'."\n".'for i in VDI VM SR host pool VBD; do '."\n".'   mv /tmp/$i.tmp /tmp/$i.json;'."\n".'done'."\n",
                        'help_name'   => 'PATH',
                        'action'=>'StoreString',
                        'default'     => DEFAULT_JSON_PATH,
                        ));
 $parser->addArgument('search', array(
-                         'description' => 'limit display to pool where search is found in "pool name", or "vm name" or "sr name" or "host name". Search is done case-insensitive',
+                         'description' => 'Limit display to pool where search is found in "pool name", or "vm name" or "sr name" or "host name". Search is done case-insensitive.',
                          'optional' => TRUE,
                          'multiple' => FALSE,
                          ));
 
 $parser->addOption('cron', array(
-                       'description' => 'usefull when run by cron to create data files',
+                       'description' => 'Usefull when run by cron to create data files.',
                        'long_name'   => '--cron',
                        'action'      => 'StoreTrue',
                        'default'     => FALSE,
                        ));
 $parser->addOption('xo_cli_path', array(
-                       'description' => 'xo-cli path. Default is "'.DEFAULT_XO_CLI_PATH.'"',
+                       'description' => 'xo-cli path.',
                        'long_name'   => '--xo-cli',
                        'action'      => 'StoreString',
                        'default'     => DEFAULT_XO_CLI_PATH,
                        'help_name'   => 'PATH',
                        ));
 
+$parser->addOption('hook', array(
+                       'description' => 'hook run after files update.',
+                       'long_name'   => '--hook',
+                       'action'      => 'StoreString',
+                       'default'     => NULL,
+                       ));
+
 $parser->addOption('debug', array(
-                       'description' => 'set debug mode (only usefull with --cron)',
+                       'description' => 'Set debug mode (only usefull with --cron).',
                        'short_name'  => '-d',
                        'long_name'   => '--debug',
                        'action'      => 'StoreTrue',
@@ -73,12 +80,13 @@ catch (Exception $exc)
     $parser->displayError($exc->getMessage());
 }
 
-$show_vms = $result->options['show_vms'];
+$show_vms = $result->options['showvms'];
 $search = $result->args['search'];
 $show_used_values = $result->options['inverse'];
 $json_file_path = $result->options['json_path'];
 $debug = $result->options['debug'];
 $cron = $result->options['cron'];
+$hook = $result->options['hook'];
 
 if (!file_exists($json_file_path) || !is_dir($json_file_path))
 {
@@ -94,6 +102,11 @@ if ($cron === TRUE)
         file_put_contents('php://stderr', "Error: '$xo_cli_path'".' does not exists or is not executable'." Use --xo-cli to the a correct path.\n");
 		exit(1);
     }
+    if (!file_exists($xo_cli_path) || !is_executable($xo_cli_path))
+    {
+        file_put_contents('php://stderr', "Error: '$xo_cli_path'".' does not exists or is not executable'." Use --xo-cli to the a correct path.\n");
+		exit(1);
+    }
     if (!is_writable($json_file_path))
     {
         file_put_contents('php://stderr', "Error: '$json_file_path' permission denied.\n");
@@ -103,21 +116,27 @@ if ($cron === TRUE)
     {
         if ($debug)
         {
-	        file_put_contents('php://stderr', $xo_cli_path." --list-objects type=$obj > $json_file_path/$obj.json-tmp\n");
+            file_put_contents('php://stderr', $xo_cli_path." --list-objects type=$obj > $json_file_path/$obj.json-tmp\n");
         }
         exec($xo_cli_path." --list-objects type=$obj > $json_file_path/$obj.json-tmp", $output, $return_var);
         if ($return_var != 0)
         {
             file_put_contents('php://stderr', implode("\n", $output));
-            exit (1);
+            exit ($return_var);
         }
         if ($debug)
         {
-	        file_put_contents('php://stderr', "rename $json_file_path/$obj.json-tmp to $json_file_path/$obj.json\n");
+            file_put_contents('php://stderr', "rename $json_file_path/$obj.json-tmp to $json_file_path/$obj.json\n");
         }
         rename("$json_file_path/$obj.json-tmp", "$json_file_path/$obj.json");
     }
-    exit(0);
+
+    $return_var = 0;
+    if (!$ret && $hook)
+    {
+        echo system($hook, $return_var);
+    }
+    exit($return_var);
 }
 
 if ($show_used_values)

@@ -25,7 +25,7 @@ root@xoa:~# php xoa_summary.php pool1
 |  Disk  =    1.064 TiB   |                                                                            |                                                         |
 +-------------------------+----------------------------------------------------------------------------+---------------------------------------------------------+
 
-root@xoa:~# php xs_summary.php master1 -v
+root@xoa:~# php xoa_summary.php master1 -v
 +-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------+
 | Pool Name (description)                                     | Host CPU & RAM available                                                                                                               |
 +-------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------+
@@ -86,23 +86,30 @@ Usage:
   xoa_summary.php [options] [search]
 
 Options:
-  -v, --show-vms             show virtual machines
-  -i                         display available values instead of used
-                             values
-  -p PATH, --json-path=PATH  path to folder containing pool.json,
+  -v, --show-vms             show VMs.
+  -i                         Instead displays used values, display
+                             available values.
+  -p PATH, --json-path=PATH  Path to folder containing pool.json,
                              host.json, SR.json, VM.json, VBD.json,
                              VDI.json files.
-                             Default is /tmp/
-  --cron                     usefull when run by cron to create data files
-  --xo-cli=PATH              xo-cli path. Default is
-                             "/usr/local/bin/xo-cli"
-  -d, --debug                set debug mode (only usefull with --cron)
+                             Default is current directory.
+                             Exemple to create files :
+                             for i in VDI VM SR host pool VBD; do
+                                xo-cli --list-objects type=$i >
+                                 /tmp/$i.tmp;
+                             done;
+                             for i in VDI VM SR host pool VBD; do
+                                mv /tmp/$i.tmp /tmp/$i.json;
+                             done
+  --cron                     Usefull when run by cron to create data files.
+  --xo-cli=PATH              xo-cli path.
+  --hook=hook                hook run after files update.
+  -d, --debug                Set debug mode (only usefull with --cron).
   -h, --help                 show this help message and exit
   --version                  show the program version and exit
 
 Arguments:
-  search  limit display to pool where search is found in "pool name", or
+  search  Limit display to pool where search is found in "pool name", or
           "vm name" or "sr name" or "host name". Search is done
-          case-insensitive
-
+          case-insensitive.
 ```
