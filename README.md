@@ -20,6 +20,7 @@ root@xoa:~# php xoa_summary.php pool1
 | pool1 (master1)         |  + master1 (6.5.0)  [**        ]  1 /  8  [********* ]  26.21 /  31.96 GiB |  SR                 available / total                   |
 | Gestion Infra Xen       |                                                                            |   master1 Local SR  [***       ]    0.39 /    1.76 TiB  |
 |                         |                                                                            |                                                         |
+|  Used ressources        |                                                                            |                                                         |
 |  CPU   =        7       |                                                                            |                                                         |
 |  Ram   =        3 GiB   |                                                                            |                                                         |
 |  Disk  =    1.064 TiB   |                                                                            |                                                         |
@@ -32,10 +33,11 @@ root@xoa:~# php xoa_summary.php master1 -v
 | pool1 (master1)                                             |  + master1 (6.5.0)  [**        ]  1 /  8  [********* ]  26.21 /  31.96 GiB  +-----------------------+---+-------------+-------------+  |
 | Gestion Infra Xen                                           |                                                                             | vm1                   | 4 |       1 GiB |       1 TiB |  |
 |                                                             |                                                                             | test1                 | 1 |     256 MiB |       8 GiB |  |
-|  CPU   =        7                                           |                                                                             | XOA                   | 2 |       2 GiB |       8 GiB |  |
-|  Ram   =        3 GiB                                       |                                                                             +-----------------------+---+-------------+-------------+  |
-|  Disk  =    1.064 TiB                                       |                                                                             | Total: 3 runnings vms | 7 |       3 GiB |       1 TiB |  |
-|                                                             |                                                                             +-----------------------+---+-------------+-------------+  |
+|  Used ressources                                            |                                                                             | XOA                   | 2 |       2 GiB |       8 GiB |  |
+|  CPU   =        7                                           |                                                                             +-----------------------+---+-------------+-------------+  |
+|  Ram   =        3 GiB                                       |                                                                             | Total: 3 runnings vms | 7 |       3 GiB |       1 TiB |  |
+|  Disk  =    1.064 TiB                                       |                                                                             +-----------------------+---+-------------+-------------+  |
+|                                                             |                                                                                                                                        |
 | +--------------------+------------------------------------+ |                                                                                                                                        |
 | | SR                 | available / total                  | |                                                                                                                                        |
 | +--------------------+------------------------------------+ |                                                                                                                                        |
@@ -54,7 +56,7 @@ pear install Console_Table
 pear install Console_CommandLine
 ```
 
-Register the server to xo-server
+Register the client (xoa_summary) to your xo-server
 ```
 xo-cli --register https://your/xoa/installation your_user the_user_password
 ```

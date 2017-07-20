@@ -493,6 +493,7 @@ foreach ($pools as $pool)
      *      Format Pool Row     *
      \**************************/
     $tbl_pool_info = new Console_Table(CONSOLE_TABLE_ALIGN_LEFT, '');
+    $tbl_pool_info->addRow( [ 'Used ressources' ] );
     $tbl_pool_info->addRow( [ 'CPU', '=', pretty_print($pool_cpu_used, 0, FALSE) ] );
     $tbl_pool_info->addRow( [ 'Ram', '=', pretty_print($pool_ram_used) ] );
     $tbl_pool_info->addRow( [ 'Disk', '=', pretty_print($pool_disk_used, 3) ] );
